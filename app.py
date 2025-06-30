@@ -21,7 +21,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'mi_clave_secreta')
 app.config['SESSION_TYPE'] = 'filesystem'
 
-socketio = SocketIO(app, async_mode='threading')
+socketio = SocketIO(app)
 
 # Configuración base de datos PostgreSQL
 DB_PARAMS = {
