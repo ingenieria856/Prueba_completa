@@ -300,7 +300,7 @@ def recover():
         RECOVERY_TOKENS[token] = email
 
         msg = EmailMessage()
-        msg.set_content(f"Haz clic en el siguiente enlace para restablecer tu contraseña: http://localhost:8000/reset/{token}")
+        msg.set_content(f"Haz clic en el siguiente enlace para restablecer tu contraseña:  https://prueba-completa.onrender.com/reset/{token}")
         msg["Subject"] = "Recuperación de contraseña"
         msg["From"] = EMAIL_ADDRESS
         msg["To"] = email
