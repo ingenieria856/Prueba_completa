@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel IoT Dinámico</title>
+    <style>
+
+  .tabla-grafica-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .tabla-scroll {
+    flex: 1;
+    min-width: 300px;
+    max-height: 420px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+  }
+
+  .grafica-box {
+    flex: 2;
+    min-width: 400px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  #tablaDatos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  #tablaDatos th, #tablaDatos td {
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+
+  #tablaDatos th {
+    background-color: #3498db;
+    color: white;
+    position: sticky;
+    top: 0;
+  }
+
+  .descargas {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .button {
+    display: inline-block;
+    margin: 6px 4px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+
+  .button:hover {
+    background: linear-gradient(135deg, #2980b9, #1c6690);
+    transform: scale(1.05);
+  }
+
+  #graficaDatos {
+    width: 100%;
+    height: 400px;
+  }
+
+  @media screen and (max-width: 900px) {
+    .tabla-grafica-container {
+      flex-direction: column;
+    }
+
+    .tabla-scroll, .grafica-box {
+      width: 100%;
+    }
+  }
+
+
+
+
+
+
+
+
+
+        :root {
+            --primary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        
+        .panels-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            padding: 30px;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .panel-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-icon {
+            padding: 8px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .topic {
+            font-family: 'Courier New', monospace;
+            background-color: var(--light);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-size: 0.9rem;
+        }
+        
+        .sensor-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .sensor-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f5f7fa, #e4edf9);
+        }
+        
+        .sensor-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .sensor-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .humidity-value { color: var(--primary); }
+        .temperature-value { color: var(--warning); }
+        .generic-value { color: var(--success); }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 20px;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .btn-on { 
+            background-color: var(--success); 
+            color: white; 
+        }
+        
+        .btn-off { 
+            background-color: var(--danger); 
+            color: white; 
+        }
+        
+        /* Estilos para botones activos */
+        .btn-on.active { 
+            background-color: #27ae60; 
+            box-shadow: 0 0 10px #2ecc71; 
+        }
+        
+        .btn-off.active { 
+            background-color: #c0392b; 
+            box-shadow: 0 0 10px #e74c3c; 
+        }
+        
+        .status-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .connected { background-color: var(--success); }
+        .disconnected { background-color: var(--danger); }
+        
+        /* Animación para estado desconectado */
+        .status-flash {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1001;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-cancel {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-save {
+            background: var(--success);
+            color: white;
+        }
+
+        .wrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+  }
+  .sidebar {
+    width: 250px;
+    background: #1f2a40;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding-top: 30px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: transform 0.3s ease-in-out;
+  }
+  .sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    color: #00d1b2;
+  }
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  .sidebar ul li {
+    margin: 20px 0;
+  }
+  .sidebar ul li a {
+    text-decoration: none;
+    color: #fff;
+    padding: 15px 20px;
+    display: block;
+    font-size: 1rem;
+    transition: background 0.3s;
+  }
+  .sidebar ul li a:hover, .sidebar ul li a.active {
+    background: #00d1b2;
+    border-radius: 5px;
+  }
+  .main {
+    margin-left: 250px;
+    padding: 20px;
+    flex: 1;
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+    min-height: 100vh;
+  }
+  .main-section {
+    display: none;
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  }
+  .main-section.active {
+    display: block;
+  }
+
+  .menu-toggle {
+    display: none;
+    background: #1f2a40;
+    color: white;
+    padding: 15px;
+    font-size: 1.5rem;
+    border: none;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+      position: fixed;
+      z-index: 1000;
+    }
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    .main {
+      margin-left: 0;
+      padding-top: 60px;
+    }
+    .menu-toggle {
+      display: block;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1100;
+    }
+  }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <button class="menu-toggle" onclick="toggleSidebar()">
+  <i class="fas fa-bars"></i>
+</button>
+<div class="wrapper">
+  <div class="sidebar" id="sidebar">
+    <h2>Panel IoT</h2>
+    <ul>
+      <li><a href="#" class="active" onclick="showSection('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="#" onclick="showSection('tabla', this)"><i class="fas fa-table"></i> Tabla de Datos</a></li>
+      <li><a href="#" onclick="showSection('configuracion', this)"><i class="fas fa-cogs"></i> Configuración</a></li>
+    </ul>
+  </div>
+
+  <div class="main">
+    <div id="dashboard" class="main-section active">
+       <div class="container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-microchip"></i> Panel IoT Dinámico</h1>
+                    <div class="status-bar">
+                        <div class="status-item">
+                            <span class="status-dot connected" id="mqttStatus"></span>
+                            <span>MQTT Conectado</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" id="addDeviceBtn">
+                        <i class="fas fa-plus"></i> Nuevo Dispositivo
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="panels-container" id="devicesContainer">
+            {% for device_id, data in devices.items() %}
+            <div class="panel" id="panel-{{ device_id }}">
+                <div class="panel-header">
+                    <h2 class="panel-title">{{ data.name }}</h2>
+                    <div class="panel-actions">
+                        <button class="btn btn-icon btn-danger" onclick="deleteDevice('{{ device_id }}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <p>Tópico MQTT:</p>
+                <div class="topic">{{ data.topic }}</div>
+                
+                <div class="sensor-data">
+                    {% if data.type == 'dht22' %}
+                    <div class="sensor-card">
+                        <div class="sensor-title">Humedad</div>
+                        <div class="sensor-value humidity-value" id="humidity-{{ device_id }}">{{ data.humidity }}<small>%</small></div>
+                    </div>
+                    
+                    <div class="sensor-card">
+                        <div class="sensor-title">Temperatura</div>
+                        <div class="sensor-value temperature-value" id="temperature-{{ device_id }}">{{ data.temperature }}<small>°C</small></div>
+                    </div>
+                    {% elif data.type != 'led' %}
+                    <div class="sensor-card">
+                        <div class="sensor-title">Valor</div>
+                        <div class="sensor-value generic-value" id="value-{{ device_id }}">{{ data.value }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="chart-{{ device_id }}"></canvas>
+                </div>
+                
+                {% if data.type == 'led' %}
+                <div class="sensor-card">
+                    <div class="sensor-title">Estado</div>
+                    <div class="sensor-value generic-value" id="value-{{ device_id }}">{{ data.value }}</div>
+                </div>
+                <div class="control-buttons">
+                    
+                    <button class="btn btn-on" id="btn-on-{{ device_id }}"  onclick="sendCommand('{{ device_id }}', 'ON')">
+                        <i class="fas fa-power-off"></i> ENCENDER
+                    </button>
+                    <button class="btn btn-off" id="btn-off-{{ device_id }}"  onclick="sendCommand('{{ device_id }}', 'OFF')">
+                        <i class="fas fa-power-off"></i> APAGAR
+                    </button>
+                </div>
+                
+                {% endif %}
+                
+                <div class="status-item" style="margin-top: 15px;">
+                    <span class="status-dot {% if data.is_connected %}connected{% else %}disconnected{% endif %}" 
+                          id="status-dot-{{ device_id }}"></span>
+                    <span id="status-text-{{ device_id }}">
+                        {% if data.is_connected %}Conectado{% else %}Desconectado{% endif %}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <footer style="text-align: center; padding: 20px; background: var(--dark); color: white;">
+            <p>Sistema IoT Dinámico con ESP32 | Crea tus propios dispositivos</p>
+        </footer>
+    </div>
+    
+    <!-- Modal para agregar dispositivo -->
+    <div class="modal" id="addDeviceModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;"><i class="fas fa-plus-circle"></i> Crear Nuevo Dispositivo</h2>
+            <form id="deviceForm">
+                <div class="form-group">
+                    <label for="deviceName">Nombre del dispositivo</label>
+                    <input type="text" id="deviceName" required placeholder="Ej: Sensor Sala">
+                </div>
+                
+                <div class="form-group">
+                    <label for="deviceId">ID único</label>
+                    <input type="text" id="deviceId" required placeholder="Ej: sensor_sala">
+                    <small style="color: #666;">(3-20 caracteres alfanuméricos)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deviceTopic">Tópico MQTT</label>
+                    <input type="text" id="deviceTopic" required placeholder="Ej: usuario_abcd/sala/dht">
+                </div>
+                
+                <div class="form-group">
+                    <label for="deviceType">Tipo de dispositivo</label>
+                    <select id="deviceType" required>
+                        <option value="dht22">Sensor DHT22 (Temperatura/Humedad)</option>
+                        <option value="sensor">Sensor Genérico</option>
+                        <option value="led">Control Bomba de agua</option>
+                    </select>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">Cancelar</button>
+                    <button type="submit" class="btn btn-save">Crear Dispositivo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    </div>
+    <div id="tabla" class="main-section">
+  <h2>Tabla de Datos</h2>
+  <p id="tablaMsg">Selecciona un dispositivo para ver los datos.</p>
+
+  <div class="device-buttons">
+    {% for device_id, device in devices.items() %}
+      <button class="button" onclick="cargarDatos('{{ device_id }}')">
+        📊 {{ device.name }} ({{ device_id }})
+      </button>
+    {% endfor %}
+  </div>
+
+  <!-- Contenedor horizontal -->
+  <div class="tabla-grafica-container">
+    <!-- Tabla (izquierda) -->
+    <div class="tabla-scroll">
+      <table id="tablaDatos">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Valor</th>
+            <th>Humedad</th>
+            <th>Temperatura</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="descargas">
+        <a id="descargaCSV" class="button" href="#" style="display: none;" download>📥 CSV</a>
+        <a id="descargaXLSX" class="button" href="#" style="display: none;" download>📥 Excel</a>
+      </div>
+    </div>
+
+    <!-- Gráfica (derecha) -->
+    <div class="grafica-box">
+      <canvas id="graficaDatos" style="display: none;"></canvas>
+    </div>
+  </div>
+</div>
+
+
+
+    <div id="configuracion" class="main-section">
+      <h2>Configuración</h2>
+      <p>Opciones y parámetros del sistema.</p>
+    </div>
+  </div>
+</div>
+    <script>
+        // ****************************
+        // FUNCIONES GLOBALES (FIX)
+        // ****************************
+        
+        // Función para eliminar dispositivo
+        function deleteDevice(deviceId) {
+            if (confirm(`¿Eliminar el dispositivo "${deviceId}"?`)) {
+                fetch('/delete_device', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        device_id: deviceId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`panel-${deviceId}`).remove();
+                    } else {
+                        alert('Error al eliminar dispositivo');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al eliminar dispositivo');
+                });
+            }
+        }
+        
+        // Función para controlar dispositivos con feedback visual
+        function sendCommand(deviceId, command) {
+            const btnOn = document.getElementById(`btn-on-${deviceId}`);
+            const btnOff = document.getElementById(`btn-off-${deviceId}`);
+            
+            // Resetear todos los botones primero
+            if (btnOn && btnOff) {
+                btnOn.classList.remove('active');
+                btnOff.classList.remove('active');
+                
+                // Activar botón seleccionado
+                if (command === 'ON') {
+                    btnOn.classList.add('active');
+                } else if (command === 'OFF') {
+                    btnOff.classList.add('active');
+                }
+            }
+            
+            // Enviar comando al servidor
+            fetch('/control_device', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    device_id: deviceId,
+                    command: command
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('Error al enviar comando');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al enviar comando');
+            });
+        }
+
+        // ****************************
+        // SOCKET.IO Y MÁS
+        // ****************************
+        
+        // Configuración SocketIO
+        const socket = io({
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            reconnectionAttempts: Infinity
+        });
+
+        // Estado MQTT en tiempo real
+        socket.on('mqtt_status', data => {
+            const statusDot = document.getElementById('mqttStatus');
+            if (statusDot) {
+                statusDot.className = data.connected ? 
+                    'status-dot connected' : 'status-dot disconnected status-flash';
+            }
+        });
+
+        // Actualizar estado de conexión específico
+        socket.on('connection_status', data => {
+            const statusDot = document.getElementById(`status-dot-${data.device_id}`);
+            const statusText = document.getElementById(`status-text-${data.device_id}`);
+            
+            if (statusDot && statusText) {
+                statusDot.className = data.is_connected ? 
+                    'status-dot connected' : 'status-dot disconnected status-flash';
+                statusText.textContent = data.is_connected ? 'Conectado' : 'Desconectado';
+            }
+        });
+
+        // Modal y formulario
+        const modal = document.getElementById('addDeviceModal');
+        const addDeviceBtn = document.getElementById('addDeviceBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const deviceForm = document.getElementById('deviceForm');
+        
+        // Función para mostrar el modal
+        function showModal() {
+            modal.style.display = 'flex';
+        }
+        
+        // Función para ocultar el modal
+        function hideModal() {
+            modal.style.display = 'none';
+        }
+        
+        // Event listeners
+        addDeviceBtn.addEventListener('click', showModal);
+        cancelBtn.addEventListener('click', hideModal);
+        
+        deviceForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            createDevice();
+        });
+        
+        // Función para crear dispositivo
+        function createDevice() {
+            const deviceData = {
+                name: document.getElementById('deviceName').value,
+                id: document.getElementById('deviceId').value,
+                topic: document.getElementById('deviceTopic').value,
+                type: document.getElementById('deviceType').value
+            };
+            
+            fetch('/add_device', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(deviceData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    hideModal();
+                    deviceForm.reset();
+                    location.reload();
+                } else {
+                    alert(data.error || 'Error al crear dispositivo');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al crear dispositivo');
+            });
+        }
+
+        // Inicializar gráficos con persistencia local - CORRECCIÓN APLICADA
+        {% for device_id, data in devices.items() %}
+        try {
+            const ctx = document.getElementById('chart-{{ device_id }}');
+            // CORRECCIÓN: Eliminamos el 'continue' problemático
+            if (!ctx) {
+                console.log('Canvas no encontrado para {{ device_id }}');
+            } else {
+                // Recuperar historial de localStorage
+                const storageKey = `chartData-{{ device_id }}`;
+                const savedData = JSON.parse(localStorage.getItem(storageKey)) || Array(20).fill(0);
+                
+                const chart = new Chart(ctx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: Array(savedData.length).fill(''),
+                        datasets: [{
+                            label: '{{ data.name }}',
+                            data: savedData,
+                            borderColor: '{% if data.type == "dht22" %}#3498db{% elif data.type == "led" %}#2ecc71{% else %}#f39c12{% endif %}',
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                            },
+                            x: { 
+                                display: false,
+                                grid: { display: false }
+                            }
+                        },
+                        animation: {
+                            duration: 300
+                        }
+                    }
+                });
+                
+                // Guardar referencia al gráfico
+                window[`chart_{{ device_id.replace('-', '_') }}`] = chart;
+                
+                // Listener para actualizar gráfica
+                socket.on('device_update', data => {
+                    if (data.device_id === '{{ device_id }}') {
+                        console.log('📦 Dispositivo actualizado:', data.device_id );
+                        // Actualizar valores
+                        if (data.data.type === 'dht22') {
+                            const humidityEl = document.getElementById(`humidity-{{ device_id }}`);
+                            const tempEl = document.getElementById(`temperature-{{ device_id }}`);
+                            
+                            if (humidityEl) humidityEl.innerHTML = `${data.data.humidity}<small>%</small>`;
+                            if (tempEl) tempEl.innerHTML = `${data.data.temperature}<small>°C</small>`;
+                        } else {
+                            const valueEl = document.getElementById(`value-{{ device_id }}`);
+                            
+                            if (valueEl) valueEl.innerHTML = data.data.value;
+                        }
+                        
+                        // Actualizar gráfica
+                        const value = data.data.type === 'dht22' ? 
+                            data.data.temperature : data.data.value;
+                            console.log(data.data.temperature)
+                            console.log(data.data.value)
+
+                        
+                        chart.data.datasets[0].data.push(value);
+                        if (chart.data.datasets[0].data.length > 50) {
+                            chart.data.datasets[0].data.shift();
+                        }
+                        chart.update();
+                        
+
+
+
+
+
+
+                        // Persistir en localStorage
+                        localStorage.setItem(storageKey, 
+                            JSON.stringify(chart.data.datasets[0].data));
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error inicializando gráfico para {{ device_id }}:', error);
+        }
+        {% endfor %}
+ function showSection(id, el) {
+    document.querySelectorAll('.main-section').forEach(section => {
+      section.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+
+    document.querySelectorAll('.sidebar ul li a').forEach(link => {
+      link.classList.remove('active');
+    });
+    el.classList.add('active');
+
+    // Cierra el sidebar en modo responsive
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar').classList.remove('active');
+    }
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('active');
+  }
+
+
+
+
+   function cargarDatos(deviceId) {
+    fetch(`/api/device_data/${deviceId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          document.getElementById("tablaMsg").innerText = "No se pudo cargar la información del dispositivo.";
+          return;
+        }
+
+        const tabla = document.getElementById("tablaDatos");
+        const tbody = tabla.querySelector("tbody");
+        tbody.innerHTML = "";
+
+        data.data.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${new Date(row.timestamp * 1000).toLocaleString()}</td>
+            <td>${row.value}</td>
+            <td>${row.humidity}</td>
+            <td>${row.temperature}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById("tablaMsg").innerText = "Mostrando datos de: " + deviceId;
+        tabla.style.display = "table";
+
+        const descarga = document.getElementById("descargaCSV");
+        descarga.href = `/download_data/${deviceId}`;
+        descarga.style.display = "inline-block";
+      })
+      .catch(error => {
+        document.getElementById("tablaMsg").innerText = "Error al cargar los datos.";
+        console.error(error);
+      });
+  }
+    </script>
+
+    <script>
+  let chart = null;
+
+  function cargarDatos(deviceId) {
+    fetch(`/api/device_data/${deviceId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          document.getElementById("tablaMsg").innerText = "No se pudo cargar la información del dispositivo.";
+          return;
+        }
+
+        const tabla = document.getElementById("tablaDatos");
+        const tbody = tabla.querySelector("tbody");
+        tbody.innerHTML = "";
+
+        const labels = [];
+        const valores = [];
+        const humedades = [];
+        const temperaturas = [];
+
+        data.data.reverse().forEach(row => {
+          const fecha = new Date(row.timestamp * 1000).toLocaleString();
+          labels.push(fecha);
+          valores.push(row.value);
+          humedades.push(row.humidity);
+          temperaturas.push(row.temperature);
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${fecha}</td>
+            <td>${row.value}</td>
+            <td>${row.humidity}</td>
+            <td>${row.temperature}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById("tablaMsg").innerText = "Mostrando datos de: " + deviceId;
+        tabla.style.display = "table";
+
+        document.getElementById("descargaCSV").href = `/download_data/${deviceId}`;
+        document.getElementById("descargaCSV").style.display = "inline-block";
+
+        document.getElementById("descargaXLSX").href = `/download_excel/${deviceId}`;
+        document.getElementById("descargaXLSX").style.display = "inline-block";
+
+        // Mostrar gráfica moderna
+        const canvas = document.getElementById("graficaDatos");
+        canvas.style.display = "block";
+        const ctx = canvas.getContext("2d");
+
+        const gradientValor = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientValor.addColorStop(0, '#2980b9');
+        gradientValor.addColorStop(1, '#6dd5fa');
+
+        const gradientHumedad = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientHumedad.addColorStop(0, '#27ae60');
+        gradientHumedad.addColorStop(1, '#a8e063');
+
+        const gradientTemp = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientTemp.addColorStop(0, '#e67e22');
+        gradientTemp.addColorStop(1, '#f7b733');
+
+        if (chart) chart.destroy();
+
+        chart = new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Valor',
+                data: valores,
+                borderColor: gradientValor,
+                backgroundColor: gradientValor,
+                tension: 0.3,
+                fill: false,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              },
+              {
+                label: 'Humedad (%)',
+                data: humedades,
+                borderColor: gradientHumedad,
+                backgroundColor: gradientHumedad,
+                tension: 0.3,
+                fill: false,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              },
+              {
+                label: 'Temperatura (°C)',
+                data: temperaturas,
+                borderColor: gradientTemp,
+                backgroundColor: gradientTemp,
+                tension: 0.3,
+                fill: false,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                ticks: {
+                  color: '#666',
+                  maxRotation: 45,
+                  autoSkip: true,
+                  maxTicksLimit: 12
+                },
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: '#666'
+                },
+                grid: {
+                  color: '#eee'
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  color: '#333',
+                  font: {
+                    weight: 'bold'
+                  }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: '#ccc',
+                borderWidth: 1
+              }
+            }
+          }
+        });
+      })
+      .catch(error => {
+        document.getElementById("tablaMsg").innerText = "Error al cargar los datos.";
+        console.error(error);
+      });
+  }
+</script>
+</body>
+</html>
