@@ -427,7 +427,7 @@ def keep_alive():
     import requests
     while True:
         try:
-            requests.get("https://tu-app.onrender.com")
+            requests.get("https://prueba-completa.onrender.com")
             print("✅ Ping enviado")
         except:
             pass
